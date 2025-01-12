@@ -13,6 +13,13 @@ from pprint import pprint
 from csv import DictWriter
 
 
+class PhonebookError(Exception):
+    pass
+
+class ContactNotFoundError(PhonebookError):
+    pass
+
+
 def read_file(input_file_path: Path) -> dict[int, dict]:
     buffer = {}
     with input_file_path.open(mode="r", encoding='utf-8-sig') as csvfile:
@@ -49,8 +56,11 @@ def create_contact(buffer: dict[int, dict], name: str, phone: str, company: str)
     buffer[next_id] = new_contact
 
 
-def delete_contact(buffer: dict[int, dict], id: int) -> None:
-    del buffer[id]
+def delete_contact(buffer: dict[int, dict], id_: int) -> None:
+    try:
+        del buffer[id_]
+    except KeyError:
+        raise ContactNotFoundError
 
 
 def update_contact(buffer: dict[int, dict], id_contact: int, name: str, phone: str, company: str) -> None:
@@ -62,17 +72,24 @@ def update_contact(buffer: dict[int, dict], id_contact: int, name: str, phone: s
 
 
 def find_contact(buffer: dict[int, dict], search_data: str) -> dict[int, dict]:
-    search_result = {}
+    search_results = {}
     for row_id, row_content in buffer.items():
         content_values = row_content.values()
         for value in content_values:
             if search_data.lower() in value.lower():
-                search_result[row_id] = row_content
+                search_results[row_id] = row_content
                 break
-    return search_result
+    return search_results
 
 def give_all_contacts(buffer: dict[int, dict]) -> dict[int, dict]:
     return buffer
+
+def get_contact_data(buffer: dict[int, dict], id_: int) -> dict:
+    try:
+        contact_data = buffer[id_]
+        return contact_data
+    except KeyError:
+        raise ContactNotFoundError
 
 
 if __name__ == '__main__':
