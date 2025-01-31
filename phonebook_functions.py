@@ -25,10 +25,12 @@ class ContactNotFoundError(PhonebookError):
 class PhoneBook:
     path: Path
     buffer: dict[int, dict]
+    any_changes_made: bool
 
     def __init__(self, path: Path):
         self.path = path
         self.buffer = {}
+        self.any_changes_made = False
 
     def read_file(self) -> None:
         self.buffer = {}
@@ -54,17 +56,19 @@ class PhoneBook:
                     'Company': row_content['Company'],
                 }
                 writer.writerow(data)
+        self.any_changes_made = False
 
     def create_contact(self, name: str, phone: str, company: str) -> None:
         last_id = max(self.buffer.keys())
         next_id = last_id + 1
-
         new_contact = {'Name': name, 'Phone': phone, 'Company': company}
         self.buffer[next_id] = new_contact
+        self.any_changes_made = True
 
     def delete_contact(self, id_: int) -> None:
         try:
             del self.buffer[id_]
+            self.any_changes_made = True
         except KeyError:
             raise ContactNotFoundError
 
@@ -74,6 +78,7 @@ class PhoneBook:
             'Phone': phone,
             'Company': company,
         }
+        self.any_changes_made = True
 
     def find_contact(self, search_data: str) -> dict[int, dict]:
         search_results = {}

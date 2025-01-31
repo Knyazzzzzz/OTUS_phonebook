@@ -23,12 +23,10 @@ COMMANDS = {
     7: 'Выход',
 }
 
-TELEPHONE_BOOK_FILE_PATH = Path('data/input_data2.csv')
+TELEPHONE_BOOK_FILE_PATH = Path('data/input_data.csv')
 
 phonebook = PhoneBook(TELEPHONE_BOOK_FILE_PATH)
 phonebook.read_file()
-
-any_changes_made = False
 
 
 def print_content(contacts: dict[int, dict]) -> None:
@@ -97,7 +95,6 @@ while True:
         input_phone = input('Введите телефон:')
         input_company = input('Введите название компании:')
         phonebook.create_contact(name=input_name, phone=input_phone, company=input_company)
-        any_changes_made = True
 
     elif choice_int == 3:
         input_data = input('Введите поисковый запрос:')
@@ -137,8 +134,8 @@ while True:
         # company_to_save = changed_company if changed_company != '' else contact_data['Company']
 
         phonebook.update_contact(id_contact=contact_id, name=name_to_save, phone=phone_to_save, company=company_to_save)
-        if changed_name != '' or changed_phone != '' or changed_company != '':
-            any_changes_made = True
+        # if changed_name != '' or changed_phone != '' or changed_company != '':
+        #     any_changes_made = True
 
     elif choice_int == 5:
         print('Введите ID контакта, который вы хотите удалить:')
@@ -149,14 +146,12 @@ while True:
                 break
             except ContactNotFoundError:
                 print('Контакт не найден. Введите номер существующего контакта')
-        any_changes_made = True
 
     elif choice_int == 6:
         phonebook.save_file()
-        any_changes_made = False
 
     elif choice_int == 7:
-        if not any_changes_made:
+        if not phonebook.any_changes_made:
             break
         else:
             print('Ваши изменения не были сохранены. Сохранить их? (да/нет)')
