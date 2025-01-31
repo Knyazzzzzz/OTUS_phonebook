@@ -2,8 +2,7 @@
 from pathlib import Path
 from pprint import pprint
 
-from phonebook_functions import read_file, give_all_contacts, create_contact, find_contact, get_contact_data, \
-    ContactNotFoundError, update_contact, delete_contact, save_file
+from phonebook_functions import PhoneBook, ContactNotFoundError
 
 # 1 - показать все контакты
 # 2 - создать контакт
@@ -24,9 +23,10 @@ COMMANDS = {
     7: 'Выход',
 }
 
-TELEPHONE_BOOK_FILE_PATH = Path('data/input_data.csv')
+TELEPHONE_BOOK_FILE_PATH = Path('data/input_data2.csv')
 
-buffer = read_file(TELEPHONE_BOOK_FILE_PATH)
+phonebook = PhoneBook(TELEPHONE_BOOK_FILE_PATH)
+phonebook.read_file()
 
 any_changes_made = False
 
@@ -89,19 +89,19 @@ while True:
         continue
 
     if choice_int == 1:
-        all_contacts = give_all_contacts(buffer)
+        all_contacts = phonebook.give_all_contacts()
         print_content(all_contacts)
 
     elif choice_int == 2:
         input_name = input('Введите имя:')
         input_phone = input('Введите телефон:')
         input_company = input('Введите название компании:')
-        create_contact(buffer, name=input_name, phone=input_phone, company=input_company)
+        phonebook.create_contact(name=input_name, phone=input_phone, company=input_company)
         any_changes_made = True
 
     elif choice_int == 3:
         input_data = input('Введите поисковый запрос:')
-        search_results = find_contact(buffer, search_data=input_data)
+        search_results = phonebook.find_contact(search_data=input_data)
         print_content(search_results)
 
 
@@ -110,7 +110,7 @@ while True:
         while True:
             contact_id = input_int('')
             try:
-                contact_data = get_contact_data(buffer, id_=contact_id)
+                contact_data = phonebook.get_contact_data(id_=contact_id)
                 break
             except ContactNotFoundError:
                 print('Контакт не найден. Введите номер существующего контакта')
@@ -136,7 +136,7 @@ while True:
             company_to_save = contact_data['Company']
         # company_to_save = changed_company if changed_company != '' else contact_data['Company']
 
-        update_contact(buffer, id_contact=contact_id, name=name_to_save, phone=phone_to_save, company=company_to_save)
+        phonebook.update_contact(id_contact=contact_id, name=name_to_save, phone=phone_to_save, company=company_to_save)
         if changed_name != '' or changed_phone != '' or changed_company != '':
             any_changes_made = True
 
@@ -145,14 +145,14 @@ while True:
         while True:
             contact_id = input_int('')
             try:
-                delete_contact(buffer, id_=contact_id)
+                phonebook.delete_contact(id_=contact_id)
                 break
             except ContactNotFoundError:
                 print('Контакт не найден. Введите номер существующего контакта')
         any_changes_made = True
 
     elif choice_int == 6:
-        save_file(buffer, TELEPHONE_BOOK_FILE_PATH)
+        phonebook.save_file()
         any_changes_made = False
 
     elif choice_int == 7:
@@ -162,7 +162,7 @@ while True:
             print('Ваши изменения не были сохранены. Сохранить их? (да/нет)')
             exit_decision = input_bool()
             if exit_decision is True:
-                save_file(buffer, TELEPHONE_BOOK_FILE_PATH)
+                phonebook.save_file()
                 break
             else:
                 break
