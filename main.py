@@ -2,7 +2,8 @@
 from pathlib import Path
 from pprint import pprint
 
-from phonebook_functions import PhoneBook, ContactNotFoundError
+
+from phonebook_functions import PhoneBook, ContactNotFoundError, Contact
 
 # 1 - показать все контакты
 # 2 - создать контакт
@@ -29,11 +30,11 @@ phonebook = PhoneBook(TELEPHONE_BOOK_FILE_PATH)
 phonebook.read_file()
 
 
-def print_content(contacts: dict[int, dict]) -> None:
-    for id_, data in contacts.items():
-        name = data['Name']
-        phone = data['Phone']
-        company = data['Company']
+def print_content(contacts: dict[int, Contact]) -> None:
+    for id_, contact in contacts.items():
+        name = contact.name
+        phone = contact.phone
+        company = contact.company
         print(f'Номер записи: {id_}, Имя: {name}, Телефон: {phone}, Компания: {company}')
 
 
@@ -107,35 +108,33 @@ while True:
         while True:
             contact_id = input_int('')
             try:
-                contact_data = phonebook.get_contact_data(id_=contact_id)
+                contact = phonebook.get_contact(id_=contact_id)
                 break
             except ContactNotFoundError:
                 print('Контакт не найден. Введите номер существующего контакта')
 
         changed_name = input('Введите новое имя (нажмите Enter если не хотите вносить изменений в данное поле):')
         changed_phone = input('Введите новый телефон (нажмите Enter если не хотите вносить изменений в данное поле):')
-        changed_company = input(
-            'Введите новое название компании (нажмите Enter если не хотите вносить изменений в данное поле):')
+        changed_company = input('Введите новое название компании (нажмите Enter если не хотите вносить изменений в данное поле):')
 
         if changed_name != '':
             name_to_save = changed_name
         else:
-            name_to_save = contact_data['Name']
+            name_to_save = contact.name
 
         if changed_phone != '':
             phone_to_save = changed_phone
         else:
-            phone_to_save = contact_data['Phone']
+            phone_to_save = contact.phone
 
         if changed_company != '':
             company_to_save = changed_company
         else:
-            company_to_save = contact_data['Company']
-        # company_to_save = changed_company if changed_company != '' else contact_data['Company']
+            company_to_save = contact.company
+        # company_to_save = changed_company if changed_company != '' else contact.company
 
         phonebook.update_contact(id_contact=contact_id, name=name_to_save, phone=phone_to_save, company=company_to_save)
-        # if changed_name != '' or changed_phone != '' or changed_company != '':
-        #     any_changes_made = True
+
 
     elif choice_int == 5:
         print('Введите ID контакта, который вы хотите удалить:')

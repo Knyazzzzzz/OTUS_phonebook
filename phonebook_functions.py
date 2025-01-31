@@ -21,10 +21,21 @@ class PhonebookError(Exception):
 class ContactNotFoundError(PhonebookError):
     pass
 
+class Contact:
+    name: str
+    phone: str
+    company: str
+
+    def __init__(self, name: str, phone: str, company: str):
+        self.name = name
+        self.phone = phone
+        self.company = company
+
+
 
 class PhoneBook:
     path: Path
-    buffer: dict[int, dict]
+    buffer: dict[int, Contact]
     any_changes_made: bool
 
     def __init__(self, path: Path):
@@ -39,21 +50,23 @@ class PhoneBook:
             for row in reader:
                 row_id = row.pop("ID")
                 row_id_int = int(row_id)
-                self.buffer[row_id_int] = row
+                contact = Contact(name=row['Name'], phone=row['Phone'], company=row['Company'])
+                self.buffer[row_id_int] = contact
+
 
     def save_file(self) -> None:
         with self.path.open(mode="w", encoding='utf-8-sig') as csvfile:
             fieldnames = ['ID', 'Name', 'Phone', 'Company']
             writer = DictWriter(csvfile, delimiter=';', fieldnames=fieldnames)
             writer.writeheader()
-            for row_id, row_content in self.buffer.items():
+            for row_id, contact in self.buffer.items():
                 # for row_id in buffer:
                 #   row_content = buffer[row_id]
                 data = {
                     'ID': row_id,
-                    'Name': row_content['Name'],
-                    'Phone': row_content['Phone'],
-                    'Company': row_content['Company'],
+                    'Name': contact.name,
+                    'Phone': contact.phone,
+                    'Company': contact.company,
                 }
                 writer.writerow(data)
         self.any_changes_made = False
@@ -61,7 +74,7 @@ class PhoneBook:
     def create_contact(self, name: str, phone: str, company: str) -> None:
         last_id = max(self.buffer.keys())
         next_id = last_id + 1
-        new_contact = {'Name': name, 'Phone': phone, 'Company': company}
+        new_contact = Contact(name=name, phone=phone, company=company)
         self.buffer[next_id] = new_contact
         self.any_changes_made = True
 
@@ -73,30 +86,26 @@ class PhoneBook:
             raise ContactNotFoundError
 
     def update_contact(self, id_contact: int, name: str, phone: str, company: str) -> None:
-        self.buffer[id_contact] = {
-            'Name': name,
-            'Phone': phone,
-            'Company': company,
-        }
+        self.buffer[id_contact] = Contact(name=name, phone=phone, company=company)
         self.any_changes_made = True
 
-    def find_contact(self, search_data: str) -> dict[int, dict]:
+    def find_contact(self, search_data: str) -> dict[int, Contact]:
         search_results = {}
-        for row_id, row_content in self.buffer.items():
-            content_values = row_content.values()
+        for row_id, contact in self.buffer.items():
+            content_values = [contact.name, contact.phone, contact.company]
             for value in content_values:
                 if search_data.lower() in value.lower():
-                    search_results[row_id] = row_content
+                    search_results[row_id] = contact
                     break
         return search_results
 
-    def give_all_contacts(self) -> dict[int, dict]:
+    def give_all_contacts(self) -> dict[int, Contact]:
         return self.buffer
 
-    def get_contact_data(self, id_: int) -> dict:
+    def get_contact(self, id_: int) -> Contact:
         try:
-            contact_data = self.buffer[id_]
-            return contact_data
+            contact = self.buffer[id_]
+            return contact
         except KeyError:
             raise ContactNotFoundError
 
