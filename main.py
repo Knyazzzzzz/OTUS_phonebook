@@ -1,18 +1,7 @@
-# User interface
 from pathlib import Path
 from pprint import pprint
 
-
 from phonebook_functions import PhoneBook, ContactNotFoundError, Contact
-
-# 1 - показать все контакты
-# 2 - создать контакт
-# 3 - найти контакт
-# 4 - изменить контакт
-# 5 - удалить контакт
-# 6 - сохранить изменения
-# 7 - выход
-
 
 COMMANDS = {
     1: 'Показать все контакты',
@@ -31,6 +20,16 @@ phonebook.read_file()
 
 
 def print_content(contacts: dict[int, Contact]) -> None:
+    """
+    Данная фунцкия выводит в консоль данный контакта.
+
+    Args:
+        contacts: dict[int, Contact] - принимает на вход словарь (идентификатор, элемент класса Contact)
+
+    Returns:
+        None.
+
+    """
     for id_, contact in contacts.items():
         name = contact.name
         phone = contact.phone
@@ -39,6 +38,16 @@ def print_content(contacts: dict[int, Contact]) -> None:
 
 
 def input_int(text: str) -> int:
+    """
+    Данная фунцкия принимает от пользователя ввод и проверяет, число ли это.
+
+    Args:
+        text: str - выводит необходимую по ходу программы строку-описание для пользовательского ввода
+
+    Returns:
+        Возвращает целочисленное значение -> int.
+
+    """
     print(text)
     while True:
         user_input = input()
@@ -50,6 +59,16 @@ def input_int(text: str) -> int:
 
 
 def input_bool() -> bool:
+    """
+    Данная фунцкия принимает от пользователя значение: да\нет.
+
+    Args:
+        None.
+
+    Returns:
+        Возвращает булевое значение -> bool.
+
+    """
     yes_answers = ['yes', 'y', '1', 'да']
     no_answers = ['no', 'n', '0', 'нет']
     while True:
@@ -68,19 +87,6 @@ while True:
         print(f'{number}: {description}')
 
     choice_int = input_int('Введите номер:')
-
-    # choice = input('Введите номер:')
-    # if not choice.isdigit():
-    #     print(f'{choice} - недопустимое значение. Введите цифровое значение.')
-    #     continue
-    # choice_int = int(choice)
-
-    # Проверка на int
-    # try:
-    #     choice_int = int(choice)
-    # except ValueError:
-    #     print(f'{choice} - недопустимое значение. Введите цифровое значение.')
-    #     continue
 
     if choice_int not in COMMANDS.keys():
         print("Неправильно выбрано опция, выберите число из предложенного списка")
@@ -115,7 +121,8 @@ while True:
 
         changed_name = input('Введите новое имя (нажмите Enter если не хотите вносить изменений в данное поле):')
         changed_phone = input('Введите новый телефон (нажмите Enter если не хотите вносить изменений в данное поле):')
-        changed_company = input('Введите новое название компании (нажмите Enter если не хотите вносить изменений в данное поле):')
+        changed_company = input(
+            'Введите новое название компании (нажмите Enter если не хотите вносить изменений в данное поле):')
 
         if changed_name != '':
             name_to_save = changed_name
