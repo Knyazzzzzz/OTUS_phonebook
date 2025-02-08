@@ -133,7 +133,10 @@ class PhoneBook:
         Данный метод класса обновляет данные контакт.
 
         Args:
-            self - сам объект класса, name: str, phone: str, company: str - данные контакта
+            id_contact: int - ID контакта
+            name: str
+            phone: str
+            company: str - данные контакта
 
         Returns:
             None.
